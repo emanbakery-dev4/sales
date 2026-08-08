@@ -4,9 +4,17 @@
   "license": "MIT",
   "scripts": {
     "preinstall": "sh -c 'rm -f package-lock.json yarn.lock; case \"$npm_config_user_agent\" in pnpm/*) ;; *) echo \"Use pnpm instead\" >&2; exit 1 ;; esac'",
-    "build": "pnpm run typecheck && pnpm -r --if-present run build",
+    "dev": "pnpm --filter frontend dev",
+    "build": "pnpm run typecheck && pnpm --filter frontend build && pnpm --filter worker build",
+    "lint": "pnpm --filter frontend lint && pnpm --filter worker lint",
+    "test": "pnpm --filter frontend test && pnpm --filter worker test",
+    "test:e2e": "pnpm --filter frontend test:e2e",
+    "db:migrate": "supabase db push",
+    "db:seed": "supabase db reset",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "typecheck:libs": "tsc --build",
-    "typecheck": "pnpm run typecheck:libs && pnpm -r --filter \"./artifacts/**\" --filter \"./scripts\" --if-present run typecheck"
+    "typecheck": "pnpm run typecheck:libs && pnpm --filter frontend typecheck && pnpm --filter worker typecheck && pnpm -r --filter \"./artifacts/**\" --filter \"./scripts\" --if-present run typecheck"
   },
   "private": true,
   "dependencies": {
