@@ -1,0 +1,1 @@
+- [GitHub push fallback](github-push-fallback.md) — when the native push helper rejects an existing branch, an approved secure repository credential may be needed for a direct push.
