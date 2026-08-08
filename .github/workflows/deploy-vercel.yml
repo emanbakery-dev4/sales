@@ -1,8 +1,13 @@
-name: Deploy frontend preview
+name: Deploy frontend to Vercel
 
 on:
-  push:
-    branches: [fix/production-deployment]
+  workflow_dispatch:
+    inputs:
+      production:
+        description: Deploy to production
+        required: true
+        default: false
+        type: boolean
 
 jobs:
   deploy:
@@ -24,4 +29,10 @@ jobs:
         working-directory: frontend
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-        run: pnpm dlx vercel@latest deploy --yes --token "${VERCEL_TOKEN}"
+        run: |
+          production_flag=""
+          if [[ "${{ inputs.production }}" == "true" ]]; then
+            production_flag="--prod"
+          fi
+
+          pnpm dlx vercel@latest deploy --yes ${production_flag} --token "${VERCEL_TOKEN}"
