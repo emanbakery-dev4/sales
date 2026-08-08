@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  frontend:
+    name: Frontend — lint, typecheck, build, test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test -- --run
+      - run: pnpm build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
+
+  worker:
+    name: Worker — lint, typecheck, build, test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: worker
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test -- --run
+      - run: pnpm build
+
+  migrations:
+    name: Supabase migration check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - run: supabase db lint
+      - name: Apply migrations to Staging (main branch only)
+        if: github.ref == 'refs/heads/main'
+        run: supabase db push --db-url "${{ secrets.DATABASE_URL }}"
+
+  notify:
+    name: Slack notification
+    needs: [frontend, worker, migrations]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: slackapi/slack-github-action@v2
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            {
+              "text": "CI ${{ job.status }} for ${{ github.ref_name }} — ${{ github.event.head_commit.message || github.event.pull_request.title }}"
+            }
+
+# Deployment note:
+# - Frontend deploys via Vercel's native GitHub integration (auto-deploys on push to main,
+#   preview deploys on PRs) — no separate deploy step needed here once the Vercel project
+#   is connected to this repo (see PREFLIGHT.md).
+# - Worker deploys via Railway's native GitHub integration the same way.
+# - This workflow's job is verification (lint/typecheck/build/test/migration-safety) which
+#   is what gates the branch-protection auto-merge described in PREFLIGHT.md.

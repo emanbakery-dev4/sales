@@ -1,0 +1,12 @@
+---
+description: Core standards for the Eman Bakery platform — always apply
+alwaysApply: true
+---
+
+- The single source of truth for features and behavior is `docs/SPEC.md`. The execution order is `BUILD_PLAN.md`. Operating rules are `AGENTS.md`. Read all three before writing code in a new session.
+- Never hard-delete a financial record (orders, order_items, payments, ledger_transactions, customer_product_prices, audit_logs). Deactivate or reverse instead.
+- Every table holding customer or financial data must have Row Level Security enabled with policies matching the role matrix in `docs/SPEC.md` §5.2 — no exceptions, no "temporary" open policies.
+- Compute prices, totals, and balances server-side, always — never trust a value the client sent for anything financial.
+- Match the Dark Luxury design system and motion spec in `docs/SPEC.md` §2 for any new UI — don't introduce a different visual or animation language.
+- Use the shared components already defined in `docs/SPEC.md` §2.3 (DataTable, MoneyDisplay, ConfirmDialog) rather than re-implementing per page.
+- TypeScript strict mode, ESLint, and Prettier must be clean before a commit.

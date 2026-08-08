@@ -1,0 +1,8 @@
+{
+  "install": "corepack enable && pnpm install",
+  "start": "pnpm dev",
+  "terminals": [
+    { "name": "worker", "command": "pnpm --filter worker dev" },
+    { "name": "supabase", "command": "supabase start" }
+  ]
+}
