@@ -1,0 +1,22 @@
+name: Configure Vercel project
+
+on:
+  push:
+    branches: [fix/production-deployment]
+
+jobs:
+  configure:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set the frontend project root
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          response=$(curl --fail-with-body --silent --show-error \
+            --request PATCH \
+            --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+            --header "Content-Type: application/json" \
+            --data '{"rootDirectory":"frontend"}' \
+            "https://api.vercel.com/v9/projects/prj_VL2CjCqMglxTRm0uA8cDwmRzboQM?teamId=team_ffnaEgpVX92qTQG7SrYjHHVq")
+
+          test "$(jq --raw-output '.rootDirectory' <<<"${response}")" = "frontend"
