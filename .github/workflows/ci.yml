@@ -95,11 +95,9 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Deploy preview
         if: github.event_name == 'pull_request' && env.VERCEL_TOKEN != ''
-        working-directory: frontend
         run: pnpm dlx vercel@58.9.0 deploy --yes --token "${VERCEL_TOKEN}"
       - name: Deploy production
         if: github.event_name == 'push' && github.ref == 'refs/heads/main' && env.VERCEL_TOKEN != ''
-        working-directory: frontend
         run: pnpm dlx vercel@58.9.0 deploy --yes --prod --token "${VERCEL_TOKEN}"
       - name: Vercel not configured
         if: env.VERCEL_TOKEN == ''
