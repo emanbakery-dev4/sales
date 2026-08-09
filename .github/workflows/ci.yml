@@ -64,6 +64,8 @@ jobs:
         run: supabase start
       - name: Apply migrations from empty database
         run: supabase db reset
+      - name: Verify RLS isolation and financial privileges
+        run: supabase test db
       - name: Lint local database
         run: supabase db lint --local
       - name: Stop local Supabase
