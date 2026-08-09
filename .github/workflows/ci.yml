@@ -81,7 +81,7 @@ jobs:
       contents: read
     env:
       VERCEL_ORG_ID: team_ffnaEgpVX92qTQG7SrYjHHVq
-      VERCEL_PROJECT_ID: prj_VL2CjCqMglxTRm0uA8cDwmRzboQM
+      VERCEL_PROJECT_ID: prj_tCEjR5iJft9etDLFQdwjZOmu5s2J
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
     steps:
       - uses: actions/checkout@v4
